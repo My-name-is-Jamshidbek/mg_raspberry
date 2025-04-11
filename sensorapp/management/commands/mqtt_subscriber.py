@@ -7,7 +7,7 @@ from sensorapp.models import SensorData
 import paho.mqtt.client as mqtt
 
 # MQTT connection settings
-MQTT_BROKER = "89.108.71.209"
+MQTT_BROKER = "localhost"
 MQTT_PORT = 1883
 MQTT_TOPIC = "room102/data"
 MQTT_USER = ""    # Update if needed

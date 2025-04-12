@@ -3,7 +3,7 @@ from .views import SensorDataListCreateView, save_sensor_data, latest_sensor, pr
 
 urlpatterns = [
     path('data/', SensorDataListCreateView.as_view(), name='sensor-data'),
-    path('api/save-sensor-data/', save_sensor_data, name='save-sensor-data'),
-    path('api/latest-sensor/', latest_sensor),
-    path('api/prev-sensor/', prev_sensor),
+    path('save-sensor-data/', save_sensor_data, name='save-sensor-data'),
+    path('latest-sensor/', latest_sensor),
+    path('prev-sensor/', prev_sensor),
 ]

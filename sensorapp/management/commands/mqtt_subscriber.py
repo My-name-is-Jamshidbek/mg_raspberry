@@ -1,9 +1,8 @@
 import json
 import time
+import requests
 
 from django.core.management.base import BaseCommand, CommandError
-from sensorapp.models import SensorData
-
 import paho.mqtt.client as mqtt
 
 # MQTT connection settings
@@ -13,18 +12,20 @@ MQTT_TOPIC = "room102/data"
 MQTT_USER = ""    # Update if needed
 MQTT_PASS = ""    # Update if needed
 
+# Django API endpoint to save sensor data
+API_URL = "http://localhost:8080/api/save-sensor-data/"  # Adjust for production
+
 class Command(BaseCommand):
-    help = 'Subscribe to MQTT topic and record sensor data with timestamp'
+    help = 'Subscribe to MQTT and send data to Django API'
 
     def handle(self, *args, **options):
-        self.stdout.write("Starting MQTT subscriber...")
+        self.stdout.write("🚀 Starting MQTT subscriber...")
 
-        # Create MQTT client instance
         client = mqtt.Client()
+
         if MQTT_USER or MQTT_PASS:
             client.username_pw_set(MQTT_USER, MQTT_PASS)
 
-        # Define on_connect and on_message callbacks
         client.on_connect = self.on_connect
         client.on_message = self.on_message
 
@@ -34,46 +35,34 @@ class Command(BaseCommand):
             raise CommandError(f"Unable to connect to MQTT broker: {e}")
 
         client.loop_start()
-        self.stdout.write("MQTT subscriber started. Press Ctrl+C to exit.")
+        self.stdout.write("✅ MQTT connected. Listening for messages... (Press Ctrl+C to exit)")
 
         try:
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            self.stdout.write("Exiting MQTT subscriber...")
+            self.stdout.write("🛑 Stopping MQTT subscriber...")
             client.loop_stop()
             client.disconnect()
 
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
-            self.stdout.write("Connected to MQTT broker successfully.")
+            self.stdout.write("✅ Connected to MQTT broker.")
             client.subscribe(MQTT_TOPIC)
-            self.stdout.write(f"Subscribed to topic: {MQTT_TOPIC}")
+            self.stdout.write(f"📡 Subscribed to topic: {MQTT_TOPIC}")
         else:
-            self.stdout.write(f"Failed to connect, return code {rc}")
+            self.stdout.write(f"❌ MQTT connection failed. Return code: {rc}")
 
     def on_message(self, client, userdata, msg):
-        message = msg.payload.decode()
-        self.stdout.write(f"Received message on {msg.topic}: {message}")
         try:
+            message = msg.payload.decode()
+            self.stdout.write(f"📥 MQTT message received: {message}")
             data = json.loads(message)
-        except Exception as e:
-            self.stdout.write(f"Error decoding JSON: {e}")
-            return
 
-        # Create and save a SensorData instance from the incoming data.
-        sensor_record = SensorData(
-            device_id   = data.get("device_id", ""),
-            controller  = data.get("controller", ""),
-            temperature = data.get("temperature", None),
-            humidity    = data.get("humidity", None),
-            cmk         = data.get("cmk", []),
-            motion      = data.get("motion", []),
-            button      = not data.get("button", False),
-            gas         = data.get("gas", None)
-        )
-        try:
-            sensor_record.save()
-            self.stdout.write("Sensor data saved to database.")
+            response = requests.post(API_URL, json=data)
+            if response.status_code == 201:
+                self.stdout.write("✅ Sensor data saved via API.")
+            else:
+                self.stdout.write(f"❌ API Error: {response.status_code} - {response.text}")
         except Exception as e:
-            self.stdout.write(f"Error saving sensor data: {e}")
+            self.stdout.write(f"❌ Failed to process MQTT message: {e}")

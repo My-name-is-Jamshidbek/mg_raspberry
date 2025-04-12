@@ -69,7 +69,7 @@ class Command(BaseCommand):
             humidity    = data.get("humidity", None),
             cmk         = data.get("cmk", []),
             motion      = data.get("motion", []),
-            button      = data.get("button", False),
+            button      = not data.get("button", False),
             gas         = data.get("gas", None)
         )
         try:

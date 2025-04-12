@@ -1,5 +1,5 @@
 import os
-
+import time
 import joblib
 import pandas as pd
 from django.core.management.base import BaseCommand
@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
     def rate_of_change_check(self, latest, prev):
         if not prev:
-            return True  # No previous data to compare
+            return True
 
         temp_delta = abs((latest.temperature or 0) - (prev.temperature or 0))
         gas_delta = abs((latest.gas or 0) - (prev.gas or 0))
@@ -57,7 +57,7 @@ class Command(BaseCommand):
         return True
 
     def handle(self, *args, **options):
-        print("🤖 Running ML-based emergency detection...\n")
+        print("🤖 Starting ML emergency detection loop...\n")
 
         try:
             model = joblib.load("ml_emergency_model_data.pkl")
@@ -66,37 +66,42 @@ class Command(BaseCommand):
             self.stderr.write(str(os.listdir()))
             return
 
-        latest = SensorData.objects.order_by('-timestamp').first()
-        if not latest:
-            print("No sensor data available.")
-            return
+        while True:
+            latest = SensorData.objects.order_by('-timestamp').first()
+            if not latest:
+                print("No sensor data available.")
+                time.sleep(5)
+                continue
 
-        prev = SensorData.objects.exclude(id=latest.id).order_by('-timestamp').first()
-        if not self.rate_of_change_check(latest, prev):
-            print("❌ Skipping analysis due to suspected noise.")
-            return
+            prev = SensorData.objects.exclude(id=latest.id).order_by('-timestamp').first()
+            if not self.rate_of_change_check(latest, prev):
+                print("❌ Skipping analysis due to suspected noise.")
+                time.sleep(5)
+                continue
 
-        print(f"📅 Timestamp: {latest.timestamp}")
-        print(f"🏠 Device ID: {latest.device_id} ({latest.controller})")
-        print(f"🌡️ Temp: {latest.temperature} °C")
-        print(f"💧 Humidity: {latest.humidity} %")
-        print(f"🔥 Gas: {latest.gas}")
-        print(f"🔴 Button: {latest.button}")
+            print(f"\n📅 Timestamp: {latest.timestamp}")
+            print(f"🏠 Device ID: {latest.device_id} ({latest.controller})")
+            print(f"🌡️ Temp: {latest.temperature} °C")
+            print(f"💧 Humidity: {latest.humidity} %")
+            print(f"🔥 Gas: {latest.gas}")
+            print(f"🔴 Button: {latest.button}")
 
-        input_data = pd.DataFrame([{
-            "temperature": self.sanitize(latest.temperature, 0, 100),
-            "humidity": self.sanitize(latest.humidity, 0, 100),
-            "gas": self.sanitize(latest.gas, 0, 5000),
-            "button": 1 if latest.button else 0,
-        }])
+            input_data = pd.DataFrame([{
+                "temperature": self.sanitize(latest.temperature, 0, 100),
+                "humidity": self.sanitize(latest.humidity, 0, 100),
+                "gas": self.sanitize(latest.gas, 0, 5000),
+                "button": 1 if latest.button else 0,
+            }])
 
-        prediction = model.predict(input_data)[0]
-        proba = model.predict_proba(input_data)[0][1]
+            prediction = model.predict(input_data)[0]
+            proba = model.predict_proba(input_data)[0][1]
 
-        if prediction == 1:
-            print(f"\n🚨 EMERGENCY DETECTED (ML Prediction: {proba:.2%})")
-        else:
-            print(f"\n✅ Normal (ML Prediction: {proba:.2%})")
+            if prediction == 1:
+                print(f"\n🚨 EMERGENCY DETECTED (ML Prediction: {proba:.2%})")
+            else:
+                print(f"\n✅ Normal (ML Prediction: {proba:.2%})")
 
-        risk_level = self.determine_risk_level(prediction, proba, latest)
-        print(f"\n🧩 RISK LEVEL: {risk_level}")
+            risk_level = self.determine_risk_level(prediction, proba, latest)
+            print(f"\n🧩 RISK LEVEL: {risk_level}")
+
+            time.sleep(5)

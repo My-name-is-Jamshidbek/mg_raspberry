@@ -15,7 +15,7 @@ def generate_fake_data(n=5000):
         button = random.choice([0, 0, 0, 1])  # rare panic press
 
         # Fire condition
-        fire = temp > 60 and gas > 1200
+        fire = temp > 40 and gas > 100
         motion = random.choice([[], [True, False], [False, False]])
         cmk = random.choice([[], [True, False], [False, True]])
 

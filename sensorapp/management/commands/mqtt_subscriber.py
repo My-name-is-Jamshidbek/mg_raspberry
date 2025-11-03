@@ -13,7 +13,7 @@ MQTT_USER = ""    # Update if needed
 MQTT_PASS = ""    # Update if needed
 
 # Django API endpoint to save sensor data
-API_URL = "http://localhost:80/api/save-sensor-data/"  # Adjust for production
+API_URL = "http://localhost:8080/api/save-sensor-data/"  # Adjust for production
 
 class Command(BaseCommand):
     help = 'Subscribe to MQTT and send data to Django API'
@@ -58,8 +58,6 @@ class Command(BaseCommand):
             message = msg.payload.decode()
             self.stdout.write(f"📥 MQTT message received: {message}")
             data = json.loads(message)
-            data['motion'] = data.get('motion', [True])[0]
-            data['cmk'] = data.get('cmk', [True])[0]
             print(data)
             response = requests.post(API_URL, json=data)
             if response.status_code == 201:

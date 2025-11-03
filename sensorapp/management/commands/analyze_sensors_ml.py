@@ -43,6 +43,7 @@ class Command(BaseCommand):
             return "HIGH", "PANIC BUTTON PRESSED"
 
         if prediction == 1 and proba > 0.8 and (motion or door):
+            print(prediction)
             return "HIGH", "Confirmed by context sensors"
 
         if prediction == 1 and proba > 0.6:

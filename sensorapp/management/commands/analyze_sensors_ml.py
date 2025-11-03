@@ -108,6 +108,8 @@ class Command(BaseCommand):
                     "status": risk_level.lower()
                 }
             }
+            
+            print(f"Sending payload: {payload}")
 
             response = requests.post(
                 API_SENSOR_DATA,

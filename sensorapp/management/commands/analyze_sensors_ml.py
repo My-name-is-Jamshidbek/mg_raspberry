@@ -8,7 +8,7 @@ from datetime import datetime
 
 API_LATEST = "http://localhost:80/api/latest-sensor/"
 API_PREV = "http://localhost:80/api/prev-sensor/"
-API_SENSOR_DATA = "https://mg.thejoma.uz/api/home-devices/sensor-data"
+API_SENSOR_DATA = "http://mg.thejoma.uz/api/home-devices/sensor-data"
 
 # Default configuration
 HOME_ID = os.getenv("HOME_ID", 1)

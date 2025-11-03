@@ -114,7 +114,7 @@ class Command(BaseCommand):
                 json=payload,
                 timeout=5
             )
-            print(f"Send response: {response}")
+            print(f"Send response: {response.json()}")
             if response.status_code in [200, 201]:
                 self.stdout.write(
                     self.style.SUCCESS(

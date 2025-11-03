@@ -177,7 +177,14 @@ class Command(BaseCommand):
                 }])
 
                 prediction = model.predict(input_data)[0]
-                proba = model.predict_proba(input_data)[0][1]
+                proba_array = model.predict_proba(input_data)[0]
+                
+                # Handle probability extraction safely
+                if len(proba_array) > 1:
+                    proba = proba_array[1]  # Probability of positive class
+                else:
+                    # If only one class probability, use it directly
+                    proba = proba_array[0]
 
                 # Determine risk level
                 risk_level, risk_status = self.determine_risk_level(prediction, proba, latest)

@@ -13,7 +13,7 @@ MQTT_USER = ""    # Update if needed
 MQTT_PASS = ""    # Update if needed
 
 # Django API endpoint to save sensor data
-API_URL = "http://localhost:8080/api/save-sensor-data/"  # Adjust for production
+API_URL = "http://localhost:80/api/save-sensor-data/"  # Adjust for production
 
 class Command(BaseCommand):
     help = 'Subscribe to MQTT and send data to Django API'

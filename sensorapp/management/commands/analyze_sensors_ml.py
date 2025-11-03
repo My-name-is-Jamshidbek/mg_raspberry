@@ -6,9 +6,9 @@ import requests
 from django.core.management.base import BaseCommand
 from datetime import datetime
 
-API_LATEST = "http://localhost:8080/api/latest-sensor/"
-API_PREV = "http://localhost:8080/api/prev-sensor/"
-API_SENSOR_DATA = "http://localhost:8080/api/home-devices/sensor-data"
+API_LATEST = "http://localhost:80/api/latest-sensor/"
+API_PREV = "http://localhost:80/api/prev-sensor/"
+API_SENSOR_DATA = "http://localhost:80/api/home-devices/sensor-data"
 
 # Default configuration
 HOME_ID = os.getenv("HOME_ID", 1)

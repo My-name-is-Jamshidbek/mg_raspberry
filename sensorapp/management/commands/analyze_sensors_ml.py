@@ -118,7 +118,7 @@ class Command(BaseCommand):
             if response.status_code in [200, 201]:
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f"✅ Sent 6 sensors - Risk: {risk_level} ({risk_status})"
+                        f"✅ Sent 6 sensors - Risk: {risk_level} ({risk_status}) \n {payload}"
                     )
                 )
                 return True

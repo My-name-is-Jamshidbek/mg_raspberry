@@ -156,6 +156,7 @@ class Command(BaseCommand):
 
                 # Fetch latest sensor data
                 latest = self.fetch_data(API_LATEST)
+                print(F"Latest data: {latest}")
                 if not latest:
                     self.stdout.write("⏳ No latest sensor data available.")
                     time.sleep(NORMAL_INTERVAL)

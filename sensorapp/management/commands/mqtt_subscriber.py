@@ -58,7 +58,7 @@ class Command(BaseCommand):
             message = msg.payload.decode()
             self.stdout.write(f"📥 MQTT message received: {message}")
             data = json.loads(message)
-
+            print(data)
             response = requests.post(API_URL, json=data)
             if response.status_code == 201:
                 self.stdout.write("✅ Sensor data saved via API.")

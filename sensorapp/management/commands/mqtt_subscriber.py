@@ -58,6 +58,8 @@ class Command(BaseCommand):
             message = msg.payload.decode()
             self.stdout.write(f"📥 MQTT message received: {message}")
             data = json.loads(message)
+            data['motion'] = data.get('motion', [True])[0]
+            data['cmk'] = data.get('cmk', [True])[0]
             print(data)
             response = requests.post(API_URL, json=data)
             if response.status_code == 201:

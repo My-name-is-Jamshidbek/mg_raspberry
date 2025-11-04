@@ -113,6 +113,8 @@ class Command(BaseCommand):
                     "cmk2": cmk2,
                     "button": latest.get("button"),
                 },
+                "ml_confidence": round(float(risk_level != "NORMAL"), 2),
+                "ml_prediction": risk_level,
                 "home": {
                     "status": risk_level.lower()
                 }

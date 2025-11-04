@@ -90,6 +90,7 @@ class Command(BaseCommand):
     def send_sensor_data(self, latest, risk_level, risk_status):
         """Send sensor data to server API"""
         try:
+            print(latest)
             # Extract motion and door/cmk data
             motion_status = any(latest.get("motion", []))
             door_status = any(latest.get("cmk", []))

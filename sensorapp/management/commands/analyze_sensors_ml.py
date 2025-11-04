@@ -90,21 +90,28 @@ class Command(BaseCommand):
     def send_sensor_data(self, latest, risk_level, risk_status):
         """Send sensor data to server API"""
         try:
-            print(latest)
-            # Extract motion and door/cmk data
-            motion_status = any(latest.get("motion", []))
-            door_status = any(latest.get("cmk", []))
-            print(f"Motion: {motion_status}, Door: {door_status}")
+            # # Extract motion and door/cmk data
+            # motion_status = any(latest.get("motion", []))
+            # door_status = any(latest.get("cmk", []))
+            # print(f"Motion: {motion_status}, Door: {door_status}")
+            motion1 = latest.get("motion", [True, True])[0]
+            motion2 = latest.get("motion", [True, True])[1]
+
+            cmk1 = latest.get("cmk", [True, True])[0]
+            cmk2 = latest.get("cmk", [True, True])[1]
+            
             payload = {
                 "home_id": int(HOME_ID),
-                "device_id": int(DEVICE_ID),
+                "device_id": int(DEVICE_ID),        
                 "sensors": {
-                    "1": self.sanitize(latest.get("temperature"), 0, 100),
-                    "2": self.sanitize(latest.get("humidity"), 0, 100),
-                    "3": self.sanitize(latest.get("gas"), 0, 5000),
-                    "4": 1 if motion_status else 0,                    # motion
-                    "5": 1 if door_status else 0,                      # door/cmk
-                    "6": 1 if latest.get("button") else 0,             # button
+                    "temperature": latest.get('temperature'),
+                    "humidity": latest.get('humidity'),
+                    "gas": latest.get("gas"),
+                    "motion1": motion1,
+                    "motion2": motion2,
+                    "cmk1": cmk1,
+                    "cmk2": cmk2,
+                    "button": latest.get("button"),
                 },
                 "home": {
                     "status": risk_level.lower()

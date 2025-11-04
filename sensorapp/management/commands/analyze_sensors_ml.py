@@ -93,7 +93,7 @@ class Command(BaseCommand):
             # Extract motion and door/cmk data
             motion_status = any(latest.get("motion", []))
             door_status = any(latest.get("cmk", []))
-            
+            print(f"Motion: {motion_status}, Door: {door_status}")
             payload = {
                 "home_id": int(HOME_ID),
                 "device_id": int(DEVICE_ID),

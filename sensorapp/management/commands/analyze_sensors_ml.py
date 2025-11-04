@@ -46,9 +46,9 @@ class Command(BaseCommand):
         #     print(prediction)
         #     return "HIGH", "Confirmed by context sensors"
 
-        if prediction == 1 and proba > 0.6:
-            return "MEDIUM", "ML triggered without confirmation"
-
+        # if prediction == 1 and proba > 0.6:
+        #     return "MEDIUM", "ML triggered without confirmation"
+        print(f"Prediction: {prediction}, Probability: {proba:.2f}")
         if (
             latest.get("temperature", 0) > 45 or
             latest.get("gas", 0) > 900
